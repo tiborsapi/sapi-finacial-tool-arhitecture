@@ -1,0 +1,100 @@
+@startuml FinanceContracts
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor User
+component "React Frontend" as FE
+component "Rust Backend" as BE
+database "PostgreSQL" as DB
+
+User --> FE : Uses finance dashboard
+FE --> BE : REST/JSON + gRPC-compatible contracts
+BE --> DB : SQL queries and transactions
+
+package "Backend Contracts" {
+  interface "AuthService" as AuthS {
+    + Register(RegisterRequest) : AuthResponse
+    + Login(LoginRequest) : AuthResponse
+    + Logout(LogoutRequest) : Empty
+  }
+
+  interface "TransactionService" as TxnS {
+    + ListTransactions(ListTransactionsRequest) : ListTransactionsResponse
+    + GetTransaction(GetTransactionRequest) : Transaction
+    + CreateTransaction(CreateTransactionRequest) : Transaction
+    + UpdateTransaction(UpdateTransactionRequest) : Transaction
+    + DeleteTransaction(DeleteTransactionRequest) : Empty
+  }
+
+  interface "CategoryService" as CatS {
+    + ListCategories(Empty) : ListCategoriesResponse
+    + CreateCategory(CreateCategoryRequest) : Category
+  }
+
+  interface "SummaryService" as SumS {
+    + GetSummary(SummaryRequest) : SummaryResponse
+  }
+
+  interface "InvoiceService" as InvS {
+    + CreateInvoice(CreateInvoiceRequest) : Invoice
+    + ListInvoices(ListInvoicesRequest) : ListInvoicesResponse
+  }
+}
+
+class "User" as UserMsg {
+  + id: string
+  + email: string
+  + created_at: string
+  + updated_at: string
+}
+
+class "Transaction" as TxnMsg {
+  + id: string
+  + user_id: string
+  + category_id: string
+  + type: TransactionType
+  + amount: string
+  + date: string
+  + description: string
+  + invoice_reference: string
+}
+
+class "Category" as CatMsg {
+  + id: string
+  + user_id: string
+  + name: string
+  + description: string
+}
+
+class "Invoice" as InvMsg {
+  + id: string
+  + user_id: string
+  + transaction_id: string
+  + invoice_number: string
+  + amount: string
+  + issue_date: string
+  + due_date: string
+  + notes: string
+}
+
+class "SummaryResponse" as SumMsg {
+  + total_income: string
+  + total_expenses: string
+  + net_balance: string
+  + transaction_count: int32
+}
+
+BE ..> AuthS
+BE ..> TxnS
+BE ..> CatS
+BE ..> SumS
+BE ..> InvS
+
+FE ..> AuthS
+FE ..> TxnS
+FE ..> CatS
+FE ..> SumS
+FE ..> InvS
+
+@enduml

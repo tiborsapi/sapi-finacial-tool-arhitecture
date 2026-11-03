@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+package finance.v1;
+
+option csharp_namespace = "Finance.V1";
+option go_package = "finance/v1";
+option java_package = "com.finance.v1";
+option java_multiple_files = true;
+
+message Empty {}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string created_at = 3;
+  string updated_at = 4;
+}
+
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0;
+  INCOME = 1;
+  EXPENSE = 2;
+}
+
+message Category {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string description = 4;
+  string created_at = 5;
+}
+
+message Transaction {
+  string id = 1;
+  string user_id = 2;
+  string category_id = 3;
+  TransactionType type = 4;
+  string amount = 5;
+  string date = 6;
+  string description = 7;
+  string invoice_reference = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message Invoice {
+  string id = 1;
+  string user_id = 2;
+  string transaction_id = 3;
+  string invoice_number = 4;
+  string amount = 5;
+  string issue_date = 6;
+  string due_date = 7;
+  string notes = 8;
+  string created_at = 9;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string token = 1;
+  User user = 2;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message CreateTransactionRequest {
+  string category_id = 1;
+  TransactionType type = 2;
+  string amount = 3;
+  string date = 4;
+  string description = 5;
+  string invoice_reference = 6;
+}
+
+message UpdateTransactionRequest {
+  string id = 1;
+  string category_id = 2;
+  TransactionType type = 3;
+  string amount = 4;
+  string date = 5;
+  string description = 6;
+  string invoice_reference = 7;
+}
+
+message ListTransactionsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string from_date = 3;
+  string to_date = 4;
+  string category_id = 5;
+}
+
+message ListTransactionsResponse {
+  repeated Transaction transactions = 1;
+  int32 total = 2;
+}
+
+message CreateCategoryRequest {
+  string name = 1;
+  string description = 2;
+}
+
+message ListCategoriesResponse {
+  repeated Category categories = 1;
+}
+
+message SummaryRequest {
+  string from_date = 1;
+  string to_date = 2;
+}
+
+message SummaryResponse {
+  string total_income = 1;
+  string total_expenses = 2;
+  string net_balance = 3;
+  int32 transaction_count = 4;
+}
+
+message CreateInvoiceRequest {
+  string transaction_id = 1;
+  string invoice_number = 2;
+  string amount = 3;
+  string issue_date = 4;
+  string due_date = 5;
+  string notes = 6;
+}
+
+service AuthService {
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc Logout(LogoutRequest) returns (Empty);
+}
+
+service TransactionService {
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse);
+  rpc GetTransaction(GetTransactionRequest) returns (Transaction);
+  rpc CreateTransaction(CreateTransactionRequest) returns (Transaction);
+  rpc UpdateTransaction(UpdateTransactionRequest) returns (Transaction);
+  rpc DeleteTransaction(DeleteTransactionRequest) returns (Empty);
+}
+
+service CategoryService {
+  rpc ListCategories(Empty) returns (ListCategoriesResponse);
+  rpc CreateCategory(CreateCategoryRequest) returns (Category);
+}
+
+service SummaryService {
+  rpc GetSummary(SummaryRequest) returns (SummaryResponse);
+}
+
+service InvoiceService {
+  rpc CreateInvoice(CreateInvoiceRequest) returns (Invoice);
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+}
+
+message GetTransactionRequest {
+  string id = 1;
+}
+
+message DeleteTransactionRequest {
+  string id = 1;
+}
+
+message ListInvoicesRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListInvoicesResponse {
+  repeated Invoice invoices = 1;
+  int32 total = 2;
+}
